@@ -1,0 +1,11 @@
+build/
+.vscode/
+*.depend
+*.elay
+*.out
+*.elay.ebTemp
+*.cscope_file_list
+bin/
+obj/
+Ozon/
+.jdebug

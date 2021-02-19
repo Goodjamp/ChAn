@@ -8,6 +8,7 @@
 #include "nrf.h"
 #include "frameHall.h"
 #include "ButtonProcessing.h"
+#include "Images.h"
 
 #define SCREEN_MAX_X           (SCREEN_WIDTH - 1)
 #define SCREEN_MAX_Y           (SCREEN_HEIGHT - 1)
@@ -32,11 +33,12 @@ static uint32_t rssiMaxLevel = RSSI_MAX_VALUE_INIT;
 static volatile struct {
     uint8_t currentLevel;
     MoveMarker move;
-    uint8_t text[3];
+    uint8_t text[4];
 } hMarkerState = {
     .currentLevel = RSSI_MAX_VALUE_INIT
                     + SCREEN_MAX_Y / 2,
     .move = MoveMarkerHold,
+    .text = "-00"
 };
 
 static void startHfClock(void)
@@ -87,10 +89,38 @@ void buttonPress(ButtonT button)
     }
 }
 
-static inline void updateMarkerStr(void)
+static inline void updateMarkerStr(void) {
+    hMarkerState.text[1] = hMarkerState.currentLevel / 10 + '0';
+    hMarkerState.text[2] = hMarkerState.currentLevel % 10 + '0';
+}
+
+static inline void updateScreenUserArea(void)
 {
-    hMarkerState.text[0] = hMarkerState.currentLevel / 10 + '0';
-    hMarkerState.text[1] = hMarkerState.currentLevel % 10 + '0';
+    /*Add marker position text*/
+    frameSetPosition(frameH, 104, 8);
+    frameAddString(frameH, hMarkerState.text, ARIAL_8PTS, true);
+    frameSetPosition(frameH, 104, 8 + 12);
+    frameAddString(frameH, "dB", ARIAL_8PTS, true);
+    /*Add marker line*/
+    frameAddHorizontalLine(frameH,
+                           (Point){1, hMarkerState.currentLevel - rssiMaxLevel},
+                           1, 100);
+}
+
+void corsairSeensaver(void)
+{
+    uint32_t pos = 0;
+    while (pos < (SCREEN_WIDTH - corsairLogoWidthPixels)) {
+        delayMs(40);
+        frameClear(frameH);
+        frameSetPosition(frameH, pos, 0);
+        frameAddImage(frameH, corsairLogoBitmaps, corsairLogoHeightPixels, corsairLogoWidthPixels, true, false);
+        lcdRefresh();
+        if (pos == (SCREEN_WIDTH - corsairLogoWidthPixels) / 2) {
+            delayMs(3000);
+        }
+        pos += 4;
+    }
 }
 
 void app(void)
@@ -106,9 +136,13 @@ void app(void)
     rssiInit();
     lcdInit();
     buttonProcessingInit(buttonPress);
+
     updateMarkerStr();
 
-    frameInit(frameH, lcdgetLcdBuff(), 64, 128);
+    frameInit(frameH, lcdgetLcdBuff(), SCREEN_HEIGHT, SCREEN_WIDTH);
+    corsairSeensaver();
+    frameClear(frameH);
+
     for(;;) {
         /*Update marker state*/
         if (hMarkerState.move != MoveMarkerHold) {
@@ -140,17 +174,8 @@ void app(void)
             hMarkerState.move = MoveMarkerHold;
             __enable_irq();
         }
-
         frameClear(frameH);
-        /*Add marker line*/
-        frameAddHorizontalLine(frameH,
-                               (Point){1, hMarkerState.currentLevel - rssiMaxLevel},
-                               1, 100);
-        /*Add marker position text*/
-        frameSetPosition(frameH, 104, 8);
-        frameAddString(frameH, hMarkerState.text, ARIAL_8PTS, true);
-        frameSetPosition(frameH, 104, 8 + 12);
-        frameAddString(frameH, "dB", ARIAL_8PTS, true);
+        updateScreenUserArea();
 
         for (int32_t i = 100; i >= 0; i--) {
             rssi = rssiGet(i);
@@ -162,30 +187,30 @@ void app(void)
 
             /**/
             //if (isNewFrame) {
-            if (rssi < (rssiMaxLevel + SCREEN_MAX_Y)) {
-                for (uint32_t k = (rssi < rssiMaxLevel) ? 0 : (rssi - rssiMaxLevel); k < SCREEN_HEIGHT; k++) {
-                    lcdDot(GRAPH_SHIFT + i, k, 1);
+                if (rssi < (rssiMaxLevel + SCREEN_MAX_Y)) {
+                    for (uint32_t k = (rssi < rssiMaxLevel) ? 0 : (rssi - rssiMaxLevel); k < SCREEN_HEIGHT; k++) {
+                        lcdDot(GRAPH_SHIFT + i, k, 1);
+                    }
                 }
-            }
             /*
-            } else {
+            }  else {
                 if (rssi < h[i]) {
-                    for (uint32_t k = h[i]; k >= rssi; k--) {
-                        lcdDot(GRAPH_SHIFT + i, k - RSSI_MAX_VALUE, 1);
+                    uint32_t targetPos = (rssi < rssiMaxLevel) ? 0 : rssi - rssiMaxLevel;
+                    uint32_t currentPos = (rssi < rssiMaxLevel) ? 0 : rssi - rssiMaxLevel;
+                    for (uint32_t k = h[i]; k >= targetPos; k--) {
+                        lcdDot(GRAPH_SHIFT + i, k - rssiMaxLevel, 1);
                     }
                 } else if (rssi > h[i]) {
                     for (uint32_t k = h[i]; k <= rssi; k++) {
-                        lcdDot(GRAPH_SHIFT + i, k - RSSI_MAX_VALUE, 0);
+                        lcdDot(GRAPH_SHIFT + i, k - rssiMaxLevel, 0);
                     }
                 }
             }
             */
-
             h[i] = rssi;
         }
 
         if (isLcdRefresh == true) {
-            isNewFrame = false;
             lcdRefresh();
             isLcdRefresh = false;
         }

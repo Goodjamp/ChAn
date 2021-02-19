@@ -127,27 +127,15 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Hal\Timer\Timer.h" />
+		<Unit filename="Images\CorsairLogo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Images\Images.h" />
 		<Unit filename="LinkerScript\nrf51_xxaa.ld" />
 		<Unit filename="LinkerScript\nrf_common.ld" />
 		<Extensions>
 			<code_completion />
 			<debugger>
-				<target_debugging_settings target="Release" active_interface="OpenOCD">
-					<debug_interface interface_id="OpenOCD" ip_address="localhost" ip_port="3333" path="${EMBITZ}\share\contrib\openocd\bin" executable="openocd.exe" description="nrf51.svd" dont_start_server="false" backoff_time="1000" options="0" reg_filter="0" active_family="All" gdb_before_conn="" gdb_after_conn="">
-						<family_options family_id="All">
-							<option opt_id="ID_BOARD_CH" opt_value="" />
-							<option opt_id="ID_INTERFACE_CH" opt_value="" />
-							<option opt_id="ID_TARGET_CH" opt_value="" />
-							<option opt_id="ID_TEXTCTRL1" opt_value="" />
-							<option opt_id="ID_HW_BKP_LIMIT" opt_value="" />
-							<option opt_id="ID_RESET_CH" opt_value="halt" />
-							<option opt_id="ID_LOAD_PROGRAM" opt_value="1" />
-							<option opt_id="ID_SEMIHOST_CHECK" opt_value="0" />
-							<option opt_id="ID_ADD_COMMANDS" opt_value="" />
-							<option opt_id="ID_ADD_CMNDS" opt_value="-f interface/stlink.cfg -f target/nrf51.cfg" />
-						</family_options>
-					</debug_interface>
-				</target_debugging_settings>
 				<target_debugging_settings target="Debug" active_interface="OpenOCD">
 					<debug_interface interface_id="Generic" ip_address="" ip_port="" path="" executable="" description="" dont_start_server="false" backoff_time="" options="0" reg_filter="0" active_family="" gdb_before_conn="" gdb_after_conn="" />
 					<debug_interface interface_id="J-link" ip_address="" ip_port="" path="" executable="" description="" dont_start_server="false" backoff_time="" options="0" reg_filter="0" active_family="" gdb_before_conn="" gdb_after_conn="">
@@ -179,6 +167,22 @@
 							<option opt_id="ID_TEXTCTRL1" opt_value="" />
 							<option opt_id="ID_HW_BKP_LIMIT" opt_value="" />
 							<option opt_id="ID_RESET_CH" opt_value="init" />
+							<option opt_id="ID_LOAD_PROGRAM" opt_value="1" />
+							<option opt_id="ID_SEMIHOST_CHECK" opt_value="0" />
+							<option opt_id="ID_ADD_COMMANDS" opt_value="" />
+							<option opt_id="ID_ADD_CMNDS" opt_value="-f interface/stlink.cfg -f target/nrf51.cfg" />
+						</family_options>
+					</debug_interface>
+				</target_debugging_settings>
+				<target_debugging_settings target="Release" active_interface="OpenOCD">
+					<debug_interface interface_id="OpenOCD" ip_address="localhost" ip_port="3333" path="${EMBITZ}\share\contrib\openocd\bin" executable="openocd.exe" description="nrf51.svd" dont_start_server="false" backoff_time="1000" options="0" reg_filter="0" active_family="All" gdb_before_conn="" gdb_after_conn="">
+						<family_options family_id="All">
+							<option opt_id="ID_BOARD_CH" opt_value="" />
+							<option opt_id="ID_INTERFACE_CH" opt_value="" />
+							<option opt_id="ID_TARGET_CH" opt_value="" />
+							<option opt_id="ID_TEXTCTRL1" opt_value="" />
+							<option opt_id="ID_HW_BKP_LIMIT" opt_value="" />
+							<option opt_id="ID_RESET_CH" opt_value="halt" />
 							<option opt_id="ID_LOAD_PROGRAM" opt_value="1" />
 							<option opt_id="ID_SEMIHOST_CHECK" opt_value="0" />
 							<option opt_id="ID_ADD_COMMANDS" opt_value="" />
